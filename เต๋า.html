@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมไฮโล</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            text-align: center;
+        }
+        .dice {
+            font-size: 100px;
+            margin: 20px 10px;
+            display: inline-block;
+            transition: transform 0.1s ease-in-out;
+        }
+        .shake {
+            animation: shake 0.1s infinite;
+        }
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(0); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+        .rules {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dice1" class="dice">🎲</div>
+    <div id="dice2" class="dice">🎲</div>
+    <br>
+    <button onclick="selectBet('high')">พนันสูง</button>
+    <button onclick="selectBet('low')">พนันต่ำ</button>
+    <button onclick="rollDice()">ทอยลูกเต๋า</button>
+    <div id="result" class="result"></div>
+    <div class="rules">
+        <h3>กฎของเกมไฮโล</h3>
+        <p>สูง: ผลรวมของลูกเต๋าทั้งสองลูกรวมกันได้ 8 หรือมากกว่า (8-12).</p>
+        <p>ต่ำ: ผลรวมของลูกเต๋าทั้งสองลูกรวมกันได้น้อยกว่า 8 (2-7).</p>
+    </div>
+</div>
+
+<script>
+    let userBet = null;
+    let shakeInterval = null;
+
+    function selectBet(bet) {
+        userBet = bet;
+        document.getElementById('result').textContent = `คุณพนัน ${bet === 'high' ? 'สูง' : 'ต่ำ'}.`;
+    }
+
+    function rollDice() {
+        if (userBet === null) {
+            alert('กรุณาเลือกพนันสูงหรือต่ำก่อนทอยลูกเต๋า');
+            return;
+        }
+
+        const dice1 = document.getElementById('dice1');
+        const dice2 = document.getElementById('dice2');
+        const diceFaces = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣'];
+
+        // เริ่มอนิเมชันการเขย่าลูกเต๋า
+        dice1.classList.add('shake');
+        dice2.classList.add('shake');
+
+        // เปลี่ยนข้อมูลของลูกเต๋าแบบสุ่มระหว่างการเขย่า
+        shakeInterval = setInterval(() => {
+            const randomIndex1 = Math.floor(Math.random() * 6);
+            const randomIndex2 = Math.floor(Math.random() * 6);
+            dice1.textContent = diceFaces[randomIndex1];
+            dice2.textContent = diceFaces[randomIndex2];
+        }, 100); // อัพเดตข้อมูลทุก 100 มิลลิวินาที
+
+        // หยุดอนิเมชันและแสดงผลลัพธ์หลังจาก 2 วินาที
+        setTimeout(() => {
+            clearInterval(shakeInterval);
+            dice1.classList.remove('shake');
+            dice2.classList.remove('shake');
+
+            // แสดงผลลูกเต๋าที่สุดท้าย
+            const finalIndex1 = Math.floor(Math.random() * 6);
+            const finalIndex2 = Math.floor(Math.random() * 6);
+            const dice1Value = finalIndex1 + 1;
+            const dice2Value = finalIndex2 + 1;
+            const sum = dice1Value + dice2Value;
+
+            dice1.textContent = diceFaces[finalIndex1];
+            dice2.textContent = diceFaces[finalIndex2];
+
+            let resultText = `ผลรวมของลูกเต๋าคือ ${sum}. `;
+            if (sum >= 8) {
+                resultText += 'ผลลัพธ์: สูง!';
+                if (userBet === 'high') {
+                    resultText += ' คุณชนะ!';
+                } else {
+                    resultText += ' คุณแพ้!';
+                }
+            } else {
+                resultText += 'ผลลัพธ์: ต่ำ!';
+                if (userBet === 'low') {
+                    resultText += ' คุณชนะ!';
+                } else {
+                    resultText += ' คุณแพ้!';
+                }
+            }
+            document.getElementById('result').textContent = resultText;
+            userBet = null; // รีเซ็ตการเดิมพันหลังจากทอยลูกเต๋า
+        }, 2000); // 2 วินาทีสำหรับอนิเมชัน
+    }
+</script>
+
+</body>
+</html>
